@@ -10,6 +10,8 @@ it uses vector embeddings for semantic searching after that query and context fr
 
 ## Download Models
 
+from ollama or hugging-face download following models
+
 llama3 
 
 mxbai-embed-large
