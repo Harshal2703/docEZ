@@ -8,12 +8,10 @@ import chromadb
 def clearMsg():
     st.session_state.messages = []
 
-# starter
 st.set_page_config(page_title="docEZ")
 st.header("Ask your PDF...")
 pdf = st.file_uploader("Upload your PDF", type="pdf")
 st.button("Clear chat", type="primary" , on_click=clearMsg)
-# utils
 def createChunks(pdf):
     pdf_reader = PdfReader(pdf)
     text = ""
@@ -49,14 +47,12 @@ if pdf is not None:
     if "messages" not in st.session_state:
         st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
 
-    ### Write Message History
     for msg in st.session_state.messages:
         if msg["role"] == "user":
             st.chat_message(msg["role"], avatar="🧑‍💻").write(msg["content"])
         else:
             st.chat_message(msg["role"], avatar="🤖").write(msg["content"])
 
-    ## Generator for Streaming Tokens
 
     if query := st.chat_input():
         response = ollama.embeddings(prompt=query, model="mxbai-embed-large")
