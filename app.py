@@ -5,6 +5,9 @@ import ollama
 import chromadb
 
 
+
+
+
 def clearMsg():
     st.session_state.messages = []
 
@@ -51,7 +54,7 @@ if pdf is not None:
         if msg["role"] == "user":
             st.chat_message(msg["role"], avatar="🧑‍💻").write(msg["content"])
         else:
-            st.chat_message(msg["role"], avatar="Windows 10 Anniversary Update").write(msg["content"])
+            st.chat_message(msg["role"], avatar="🤖").write(msg["content"])
 
 
     if query := st.chat_input():

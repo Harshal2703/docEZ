@@ -3,3 +3,4 @@ PyPDF2
 langchain
 ollama
 chromadb
+wrapt==1.14.0
