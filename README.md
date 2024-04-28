@@ -10,11 +10,17 @@ it uses vector embeddings for semantic searching after that query and context fr
 
 ## Download Models
 
-from ollama or hugging-face download following models
+Download ollama from https://ollama.com/
 
-llama3 
+in terminal run following commands
 
-mxbai-embed-large
+```bash
+  ollama run llama3
+```
+
+```bash
+  ollama run mxbai-embed-large
+```
 ## Installations
 
 ```bash

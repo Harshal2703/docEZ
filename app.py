@@ -51,7 +51,7 @@ if pdf is not None:
         if msg["role"] == "user":
             st.chat_message(msg["role"], avatar="🧑‍💻").write(msg["content"])
         else:
-            st.chat_message(msg["role"], avatar="🤖").write(msg["content"])
+            st.chat_message(msg["role"], avatar="Windows 10 Anniversary Update").write(msg["content"])
 
 
     if query := st.chat_input():
@@ -68,7 +68,7 @@ if pdf is not None:
         st.session_state["full_message"] = ""
         def generate_response():
             prompt=f"'''Using this data: {context}'''. '''Respond to this prompt: {query}''' don't add anything extra from your side if you are unable to find answer of query in context just say out of context don't generate anything from your side"
-            response = ollama.chat(model='llama2', stream=True, messages=[{'role': 'user', 'content': prompt}])
+            response = ollama.chat(model='llama3', stream=True, messages=[{'role': 'user', 'content': prompt}])
             for partial_resp in response:
                 token = partial_resp["message"]["content"]
                 st.session_state["full_message"] += token
