@@ -23,6 +23,13 @@ in terminal run following commands
 ```
 ## Installations
 
+
+```bash
+  python -m venv docEZ_env
+```
+```bash
+  docEZ_env/Scripts/Activate.ps1
+```
 ```bash
   pip install -r requirements.txt
 ```
