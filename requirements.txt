@@ -4,3 +4,4 @@ langchain
 ollama
 chromadb
 wrapt==1.14.0
+python-docx

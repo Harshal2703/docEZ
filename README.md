@@ -1,8 +1,7 @@
 
 # docEZ
 
-RAG (Retrieval Augmented Generation) application in which user uploads his documents and can chat with the documents using llm
-it uses vector embeddings for semantic searching after that query and context from semantic search is passed through llm to generate the answer.
+docEZ is an innovative RAG (Retrieval Augmented Generation) application that allows users to upload their documents and engage in conversations with them using advanced language models (LLMs). Leveraging vector embeddings for semantic searching, docEZ enables efficient retrieval of information from uploaded documents. The application seamlessly integrates query and context from semantic searches through LLMs to generate accurate responses.
 
 
 
@@ -10,19 +9,17 @@ it uses vector embeddings for semantic searching after that query and context fr
 
 ## Download Models
 
-Download ollama from https://ollama.com/
-
-in terminal run following commands
+To get started with docEZ, you can download the necessary models from ollama.com. After downloading, you can use the following commands in your terminal:
 
 ```bash
-  ollama run llama3
+  ollama pull llama3
 ```
 
 ```bash
-  ollama run mxbai-embed-large
+  ollama pull mxbai-embed-large
 ```
 ## Installations
-
+To set up docEZ on your local machine, follow these installation steps:
 
 ```bash
   python -m venv docEZ_env
@@ -36,8 +33,8 @@ in terminal run following commands
 
 
 ## Run
-
+Once installed, you can run docEZ using the following command:
 ```bash
   streamlit run app.py
 ```
-
+Experience the convenience of interacting with your documents in a whole new way with docEZ!
