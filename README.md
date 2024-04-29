@@ -9,7 +9,7 @@ docEZ is an innovative RAG (Retrieval Augmented Generation) application that all
 
 ## Download Models
 
-To get started with docEZ, you can download the necessary models from ollama.com. After downloading, you can use the following commands in your terminal:
+To get started with docEZ, you can download the necessary models from [ollama.com.](https://ollama.com/) After downloading, you can use the following commands in your terminal:
 
 ```bash
   ollama pull llama3
