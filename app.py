@@ -176,30 +176,39 @@ def validateCollectionName(collectionName):
     return collectionName
 
 
+def deleteFile(j):
+    client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
+    client.delete_collection(name=j["fileName"])
+    client.delete_collection(name=f'chat_{j["fileName"]}')
+    collection = client.get_collection(name="uploadedFilesInfo")
+    collection.delete(ids=[j["id"]])
+    print(j["ogFileName"])
+    print("--> ",getUploadedFileInfo())
+    st.rerun()
+
 def displayStoredFiles():
     filesInfo = getUploadedFileInfo()
     col1, col2= st.sidebar.columns(2,gap="small")
+    print("hellllll" , filesInfo , getUploadedFileInfo())
     for i, j in enumerate(filesInfo):
         # if st.sidebar.button(label=j["ogFileName"], key=i):
         #     loadChat(j)
-        if col1.button(label=j["ogFileName"], key=i):
+        if col1.button(label=j["ogFileName"], key=i+1000000):
             loadChat(j)
-        if col2.button(f"❎", key=i+1000000):
-            client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
-            client.delete_collection(name=j["fileName"])
-            client.delete_collection(name=f'chat_{j["fileName"]}')
-            collection = client.get_collection(name="uploadedFilesInfo")
-            data = collection.get()
-            filesInfo = [json.loads(i) for i in data["documents"]]
-            ids = [i for i in data["ids"]]
-            for c , file in enumerate(filesInfo):
-                if file["fileName"] == j["fileName"]:
-                    collection.delete(ids=[ids[c]])
-                    break
-            st.experimental_rerun()
+        if col2.button(f"❎", key=i):
+            deleteFile(j)
     
         
+def hardClean():
+    client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
+    t = [i.name for i in client.list_collections()]
+    print(t)
+    for i in t:
+        client.delete_collection(name=i)
+    client.create_collection(name="uploadedFilesInfo")
+    st.rerun()
 
+    
 def main():
     client = chromadb.PersistentClient(
         path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings"
@@ -219,22 +228,21 @@ def main():
             createEmbeddingsFromChunk(collection, chunks)
             collection = client.get_or_create_collection(name="uploadedFilesInfo")
             info = {
+                "id" : str(uuid.uuid1()),
                 "fileName": fileName,
                 "ogFileName": uploadedFile.name,
                 "pathToFile": path,
             }
             json_str = json.dumps(info)
-            collection.add(ids=[str(uuid.uuid1())], documents=[json_str])
+            collection.add(ids=[info["id"]], documents=[json_str])
             client.create_collection(name=f"chat_{fileName}")
 
-    displayStoredFiles()
+
+
+    
     if st.sidebar.button(label="hard clean"):
-        client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
-        t = [i.name for i in client.list_collections()]
-        print(t)
-        for i in t:
-            client.delete_collection(name=i)
-        client.create_collection(name="uploadedFilesInfo")
+        hardClean()
 
 if __name__ == "__main__":
     main()
+    displayStoredFiles()
