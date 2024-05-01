@@ -37,8 +37,7 @@ def loadChat(info):
         if i["role"] == "user":
             st.chat_message(i["role"], avatar="🧑‍💻").write(i["content"])
         else:
-            st.chat_message(i["role"], avatar="🤖").write(i["content"])
-    
+            st.chat_message(i["role"], avatar="🤖").write(i["content"])   
 
 
 
@@ -50,7 +49,7 @@ if "currentCollection" not in st.session_state:
         st.session_state["currentCollection"] = None
 
 deleteChat = st.button('delete chats' , type="primary")    
-if deleteChat:
+if deleteChat and st.session_state["currentCollection"]:
     client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
     client.delete_collection(name=f'chat_{st.session_state["currentCollection"]["fileName"]}')
     client.create_collection(name=f'chat_{st.session_state["currentCollection"]["fileName"]}')
@@ -198,6 +197,7 @@ def displayStoredFiles():
                     collection.delete(ids=[ids[c]])
                     break
             st.experimental_rerun()
+    
         
 
 def main():
@@ -228,7 +228,13 @@ def main():
             client.create_collection(name=f"chat_{fileName}")
 
     displayStoredFiles()
-
+    if st.sidebar.button(label="hard clean"):
+        client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
+        t = [i.name for i in client.list_collections()]
+        print(t)
+        for i in t:
+            client.delete_collection(name=i)
+        client.create_collection(name="uploadedFilesInfo")
 
 if __name__ == "__main__":
     main()
