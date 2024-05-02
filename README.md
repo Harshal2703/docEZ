@@ -14,7 +14,6 @@ embeddings
 ```bash
 input_files 
 ```
-input_files
 
 ## Download Models
 
