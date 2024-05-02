@@ -3,6 +3,19 @@
 
 docEZ is an innovative RAG (Retrieval Augmented Generation) application that allows users to upload their documents and engage in conversations with them using advanced language models (LLMs). Leveraging vector embeddings for semantic searching, docEZ enables efficient retrieval of information from uploaded documents. The application seamlessly integrates query and context from semantic searches through LLMs to generate accurate responses.
 
+## Create Folders
+Inside main directory create following folders
+```bash
+chats
+```
+```bash
+embeddings
+```
+```bash
+input_files 
+```
+input_files
+
 ## Download Models
 
 To get started with docEZ, you can download the necessary models from [ollama.com.](https://ollama.com/) After downloading, you can use the following commands in your terminal:
