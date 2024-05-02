@@ -10,12 +10,23 @@ import json
 import uuid
 
 
-st.title("docEZ")
+st.set_page_config(page_title="docEZ",page_icon="logo.png",layout="wide")
+abc, xyz , _= st.sidebar.columns(3,gap="small")
+code = """
+        <style>
+            .big-font {
+                font-size:50px !important;
+                font-weight: bold;
+            }
+        </style>
+"""
+st.html(code)
+abc.image(image="logo.png",use_column_width=True)
+xyz.markdown('<h1 class="big-font">docEZ</h1>', unsafe_allow_html=True)
+
 
 def getUploadedFileInfo():
-    client = chromadb.PersistentClient(
-        path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings"
-    )
+    client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
     collection = client.get_collection(name="uploadedFilesInfo")
     filesInfo = collection.get()
     filesInfo = [json.loads(i) for i in filesInfo["documents"]]
@@ -23,22 +34,17 @@ def getUploadedFileInfo():
 
 
 def loadChat(info):
-    client = chromadb.PersistentClient(
-        path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings"
-    )
+    html = f"""<h2>chat with {info['ogFileName']}</h2>"""
+    st.markdown(html, unsafe_allow_html=True)
     st.session_state["currentCollection"] = info
-    st.header(f"your chats with {info['ogFileName']}")
-
-
-    collection = client.get_collection(name=f"chat_{info['fileName']}")
-    chats = collection.get()
-    chats = [json.loads(i) for i in chats["documents"]]
+    chats = []
+    with open(st.session_state["currentCollection"]["chatFile"] , "r") as f:
+        chats = json.load(f)
     for i in chats:
         if i["role"] == "user":
             st.chat_message(i["role"], avatar="🧑‍💻").write(i["content"])
         else:
-            st.chat_message(i["role"], avatar="🤖").write(i["content"])   
-
+            st.chat_message(i["role"], avatar="logo.png").write(i["content"])   
 
 
 if "currentCollection" not in st.session_state:
@@ -47,63 +53,46 @@ if "currentCollection" not in st.session_state:
         loadChat(filesInfo[0])
     else:
         st.session_state["currentCollection"] = None
+    
 
-deleteChat = st.button('delete chats' , type="primary")    
-if deleteChat and st.session_state["currentCollection"]:
-    client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
-    client.delete_collection(name=f'chat_{st.session_state["currentCollection"]["fileName"]}')
-    client.create_collection(name=f'chat_{st.session_state["currentCollection"]["fileName"]}')
-    loadChat(st.session_state["currentCollection"])
+def showDeleteChatBtn():
+    if st.session_state["currentCollection"] != None:
+        deleteChat = st.button('delete chats')    
+        if deleteChat and st.session_state["currentCollection"]:
+            chat = [{"role" : "assistant" , "content" : f"ask me anything related to {st.session_state['currentCollection']['ogFileName']}"}]
+            with open(st.session_state["currentCollection"]["chatFile"] , "w") as f:
+                json.dump(chat, f, indent=4)
 
 
 query = st.chat_input("Say something")
 if query and st.session_state["currentCollection"]:
     loadChat(info=st.session_state["currentCollection"])
-    client = chromadb.PersistentClient(
-        path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings"
-    )
-    collection = client.get_collection(
-        name=st.session_state["currentCollection"]["fileName"]
-    )
-    
+    client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
+    collection = client.get_collection(name=st.session_state["currentCollection"]["fileName"])
     response = ollama.embeddings(prompt=query, model="mxbai-embed-large")
     results = collection.query(query_embeddings=[response["embedding"]], n_results=3)
     context = ""
     for i in results["documents"][0]:
         context += i
-    # st.write(query , st.session_state["currentCollection"] , context)
-
-
-    collection = client.get_collection(
-        name=f"chat_{st.session_state['currentCollection']['fileName']}"
-    )
-
     st.chat_message("user", avatar="🧑‍💻").write(query)
-
-    data = {"role": "user", "content": query}
-    json_str = json.dumps(data)
-    collection.add(ids=[str(uuid.uuid1())], documents=[json_str])
-
     st.session_state["full_message"] = ""
-
     def generate_response():
         prompt = f"'''Using this data: {context}'''. '''Respond to this prompt: {query}''' don't add anything extra from your side if you are unable to find answer of query in context just say out of context don't generate anything from your side"
-        response = ollama.chat(
-            model="llama3", stream=True, messages=[{"role": "user", "content": prompt}]
-        )
+        response = ollama.chat(model="llama3", stream=True, messages=[{"role": "user", "content": prompt}])
         for partial_resp in response:
             token = partial_resp["message"]["content"]
             st.session_state["full_message"] += token
             yield token
+    st.chat_message("assistant", avatar="logo.png").write_stream(generate_response)
+    fileLocation = st.session_state["currentCollection"]["chatFile"]
+    chats = []
+    with open(fileLocation , "r") as f:
+        chats = json.load(f)
+    chats.append({"role": "user", "content": query})
+    chats.append({"role": "assistant", "content": st.session_state["full_message"]})
+    with open(fileLocation , "w") as f:
+        json.dump(chats, f, indent=4)
 
-    st.chat_message("assistant", avatar="🤖").write_stream(generate_response)
-    data = {"role": "assistant", "content": st.session_state["full_message"]}
-    json_str = json.dumps(data)
-    collection.add(ids=[str(uuid.uuid1())], documents=[json_str])
-
-
-    
- 
 
 def saveUploadedFile(uploadedFile):
     path = os.path.join(os.getcwd(), "input_files", uploadedFile.name)
@@ -179,30 +168,25 @@ def validateCollectionName(collectionName):
 def deleteFile(j):
     client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
     client.delete_collection(name=j["fileName"])
-    client.delete_collection(name=f'chat_{j["fileName"]}')
     collection = client.get_collection(name="uploadedFilesInfo")
     collection.delete(ids=[j["id"]])
-    print(j["ogFileName"])
-    print("--> ",getUploadedFileInfo())
+    st.session_state["currentCollection"] = None
     st.rerun()
+
 
 def displayStoredFiles():
     filesInfo = getUploadedFileInfo()
     col1, col2= st.sidebar.columns(2,gap="small")
-    print("hellllll" , filesInfo , getUploadedFileInfo())
     for i, j in enumerate(filesInfo):
-        # if st.sidebar.button(label=j["ogFileName"], key=i):
-        #     loadChat(j)
-        if col1.button(label=j["ogFileName"], key=i+1000000):
+        if col1.button(label=j["ogFileName"], key=i+1000000,use_container_width=True):
             loadChat(j)
-        if col2.button(f"❎", key=i):
+        if col2.button(f"🗑️", key=i):
             deleteFile(j)
     
         
 def hardClean():
     client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
     t = [i.name for i in client.list_collections()]
-    print(t)
     for i in t:
         client.delete_collection(name=i)
     client.create_collection(name="uploadedFilesInfo")
@@ -232,17 +216,18 @@ def main():
                 "fileName": fileName,
                 "ogFileName": uploadedFile.name,
                 "pathToFile": path,
+                "chatFile": os.path.join(os.getcwd() , "chats" , f"chat_{fileName}.json") 
             }
             json_str = json.dumps(info)
             collection.add(ids=[info["id"]], documents=[json_str])
-            client.create_collection(name=f"chat_{fileName}")
-
-
-
-    
+            chat = [{"role" : "assistant" , "content" : f"ask me anything related to {uploadedFile.name}"}]
+            with open(info["chatFile"] , "w") as f:
+                json.dump(chat, f, indent=4)
     if st.sidebar.button(label="hard clean"):
         hardClean()
+
 
 if __name__ == "__main__":
     main()
     displayStoredFiles()
+    showDeleteChatBtn()
