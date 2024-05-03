@@ -27,7 +27,7 @@ xyz.markdown('<h1 class="big-font">docEZ</h1>', unsafe_allow_html=True)
 
 def getUploadedFileInfo():
     client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
-    collection = client.get_collection(name="uploadedFilesInfo")
+    collection = client.get_or_create_collection(name="uploadedFilesInfo")
     filesInfo = collection.get()
     filesInfo = [json.loads(i) for i in filesInfo["documents"]]
     return filesInfo
@@ -168,7 +168,7 @@ def validateCollectionName(collectionName):
 def deleteFile(j):
     client = chromadb.PersistentClient(path="E:\Mini Projects\Mini Project (Sem 6)\docEZ\embeddings")
     client.delete_collection(name=j["fileName"])
-    collection = client.get_collection(name="uploadedFilesInfo")
+    collection = client.get_or_create_collection(name="uploadedFilesInfo")
     collection.delete(ids=[j["id"]])
     st.session_state["currentCollection"] = None
     st.rerun()
@@ -189,7 +189,7 @@ def hardClean():
     t = [i.name for i in client.list_collections()]
     for i in t:
         client.delete_collection(name=i)
-    client.create_collection(name="uploadedFilesInfo")
+    client.get_or_create_collection(name="uploadedFilesInfo")
     st.rerun()
 
     
