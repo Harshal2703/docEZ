@@ -20,28 +20,28 @@ input_files
 To get started with docEZ, you can download the necessary models from [ollama.com.](https://ollama.com/) After downloading, you can use the following commands in your terminal:
 
 ```bash
-  ollama pull llama3
+ollama pull llama3
 ```
 ```bash
-  ollama pull mxbai-embed-large
+ollama pull mxbai-embed-large
 ```
 
 ## Installations
 To set up docEZ on your local machine, follow these installation steps:
 
 ```bash
-  python -m venv docEZ_env
+python -m venv docEZ_env
 ```
 ```bash
-  docEZ_env/Scripts/Activate.ps1
+docEZ_env/Scripts/Activate.ps1
 ```
 ```bash
-  pip install -r requirements.txt`
+pip install -r requirements.txt
 ```
 
 ## Run
 Once installed, you can run docEZ using the following command:
 ```bash
-  streamlit run app.py
+streamlit run app.py
 ```
 Experience the convenience of interacting with your documents in a whole new way with docEZ!
